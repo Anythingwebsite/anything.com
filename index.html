@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>anything.com</title>
+  <style>
+    /* Base Style */
+    :root {
+      --bg: #0f1115;
+      --accent: #c62828;
+      --muted: #9aa0a6;
+      --text-color: #ececec;
+      --button-bg: #282828;
+      --modal-bg: #1a1a1a;
+      --card-bg: rgba(25, 27, 35, 0.75);
+      --card-hover-bg: rgba(255, 255, 255, 0.08);
+      --button-hover-bg: rgba(255, 255, 255, 0.06);
+      --modal-border-radius: 12px;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      color: var(--text-color);
+      background-color: var(--bg);
+      margin: 0;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 20px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 5;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin: 0;
+      color: #fff;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+    }
+
+    .slogan {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 2;
+      max-width: 880px;
+      width: 90%;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+
+    section.card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: all 0.3s ease;
+    }
+
+    section.card:hover {
+      transform: translateY(-4px);
+      background: var(--card-hover-bg);
+      box-shadow: 0 14px 45px rgba(0, 0, 0, 0.6);
+    }
+
+    .owners {
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .owner {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 16px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: 0.25s;
+    }
+
+    .owner:hover {
+      background: var(--card-hover-bg);
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #news-ticker {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--accent);
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 18px;
+      z-index: 10;
+      display: none;
+      animation: slideDown 0.5s ease-out forwards;
+    }
+
+    #news-ticker button {
+      background: transparent;
+      border: none;
+      color: white;
+      font-weight: bold;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    #chatroom {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    #chatInput {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      background: #2e2e2e;
+      color: #fff;
+      border: none;
+    }
+
+    .chat-message {
+      margin: 8px 0;
+      color: #fff;
+    }
+
+    .modal-back {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal {
+      background: var(--modal-bg);
+      padding: 22px;
+      border-radius: var(--modal-border-radius);
+      max-width: 560px;
+      width: 90%;
+      box-shadow: 0 12px 44px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e9e9e9;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.3s ease-in-out;
+      text-align: left;
+    }
+
+    .modal h3 {
+      margin: 0 0 8px 0;
+      color: var(--accent);
+    }
+
+    footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    button {
+      background-color: var(--button-bg);
+      border: none;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: var(--button-hover-bg);
+    }
+
+    input[type="text"], input[type="email"], input[type="password"], textarea {
+      background-color: #2e2e2e;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    /* DVD Bouncing Background */
+    #dvdCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: var(--bg);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="dvdCanvas"></canvas>
+  <div id="news-ticker"></div>
+
+  <div class="wrap">
+    <header>
+      <h1>anything.com</h1>
+      <div class="slogan">there is no low we won't steep to for money</div>
+    </header>
+
+    <section class="card">
+      <h2>Co-Owners</h2>
+      <div class="owners">
+        <div class="owner" onclick="showPopup('fidel')">CO-CO-CO owner fidel</div>
+        <div class="owner" onclick="showPopup('johan')">co-co owner johan</div>
+        <div class="owner" onclick="showPopup('daya')">co owner daya</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Hiring and Charity</h3>
+      <button onclick="openPopup('hiring')">Hiring</button>
+      <button onclick="openPopup('charity')">Charity (aka My Pocket)</button>
+    </section>
+
+    <section class="card">
+      <h3>Statistics</h3>
+      <div>Employee Satisfaction: 98%</div>
+      <div>Share Increase: 12%</div>
+      <div>Bribes Delivered: 95%</div>
+    </section>
+
+    <section class="card">
+      <div id="loginSection">
+        <h2>Enter Master Code to Proceed:</h2>
+        <input type="text" id="masterCode" placeholder="Enter master code">
+        <button onclick="verifyMasterCode()">Submit</button>
+        <p id="loginMessage" class="muted"></p>
+      </div>
+
+      <div id="coOwnerSection" class="hidden">
+        <h2>Enter Co-Owner Secret Code:</h2>
+        <input type="text" id="coOwnerCode" placeholder="Enter your secret code">
+        <button onclick="verifyCoOwnerCode()">Submit</button>
+      </div>
+    </section>
+
+    <div id="coOwnerPanel" class="hidden">
+      <h2>Co-Owner Control Panel</h2>
+
+      <section class="card">
+        <h3>Global Announcements</h3>
+        <textarea id="globalAnnouncementInput" placeholder="Enter global announcement here..." rows="4"></textarea>
+        <button onclick="postGlobalAnnouncement()">Post Announcement</button>
+      </section>
+
+      <section class="card">
+        <h3>Chatroom</h3>
+        <div id="chatroom"></div>
+        <input type="text" id="chatInput" placeholder="Enter message..." onkeydown="if(event.key === 'Enter') sendMessage()">
+      </section>
+    </div>
+
+    <footer>
+      Evil company, stylishly parodying corporate startups. Satire only.
+    </footer>
+  </div>
+
+  <div class="modal-back" id="modalBack">
+    <div class="modal" id="modal">
+      <h3 id="modalTitle"></h3>
+      <div id="modalContent"></div>
+      <button id="modalClose" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    let coOwnerName = '';
+    const coOwnerDetails = {
+      fidel: {
+        title: 'CO-CO-CO owner fidel',
+        description: 'Fidel is the head of corruption. He has connections everywhere and knows exactly who to contact when needed.'
+      },
+      johan: {
+        title: 'co-co owner johan',
+        description: 'Johan is the head of tax evasion. He knows exactly when to hide the money and where every penny goes.'
+      },
+      daya: {
+        title: 'co owner daya',
+        description: "Daya is an industrial monopolist, but honestly, he's a lazy bum who doesn't really do much."
+      }
+    };
+
+    function verifyMasterCode() {
+      const masterCode = document.getElementById('masterCode').value;
+      if (masterCode === 'co-co-co owner') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('coOwnerSection').style.display = 'block';
+      } else {
+        document.getElementById('loginMessage').textContent = 'Invalid master code. Try again.';
+      }
+    }
+
+    function verifyCoOwnerCode() {
+      const code = document.getElementById('coOwnerCode').value;
+      if (code === '4321') coOwnerName = 'fidel';
+      else if (code === '1234') coOwnerName = 'johan';
+      else if (code === 'JEET') coOwnerName = 'daya';
+
+      if (coOwnerName) {
+        document.getElementById('coOwnerSection').style.display = 'none';
+        document.getElementById('coOwnerPanel').classList.remove('hidden');
+      } else alert('Invalid co-owner code.');
+    }
+
+    function postGlobalAnnouncement() {
+      const text = document.getElementById('globalAnnouncementInput').value.trim();
+      if (!text) return;
+      localStorage.setItem("globalAnnouncement", text);
+      const ticker = document.getElementById('news-ticker');
+      ticker.innerHTML = `🚨 Global Announcement: ${text} <button onclick="dismissAnnouncement()">✖</button>`;
+      ticker.style.display = 'block';
+      setTimeout(() => ticker.style.display = 'none', 15000);
+    }
+
+    function dismissAnnouncement() {
+      document.getElementById('news-ticker').style.display = 'none';
+    }
+
+    // Load global announcement if set in localStorage
+    window.onload = () => {
+      const storedAnnouncement = localStorage.getItem("globalAnnouncement");
+      if (storedAnnouncement) {
+        const ticker = document.getElementById('news-ticker');
+        ticker.innerHTML = `🚨 Global Announcement: ${storedAnnouncement} <button onclick="dismissAnnouncement()">✖</button>`;
+        ticker.style.display = 'block';
+      }
+    };
+
+    function sendMessage() {
+      const msg = document.getElementById('chatInput').value.trim();
+      if (!msg) return;
+      const el = document.createElement('div');
+      el.classList.add('chat-message');
+      el.textContent = `${coOwnerName}: ${msg}`;
+      document.getElementById('chatroom').appendChild(el);
+      document.getElementById('chatInput').value = '';
+
+      // Store chat message in localStorage for persistence
+      const chatMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+      chatMessages.push({ owner: coOwnerName, message: msg });
+      localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+
+      // Load and display all previous messages
+      loadMessages();
+    }
+
+    // Load chat messages from localStorage
+    function loadMessages() {
+      const chatMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+      const chatroom = document.getElementById('chatroom');
+      chatroom.innerHTML = ''; // Clear current chat messages
+      chatMessages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message');
+        messageElement.textContent = `${msg.owner}: ${msg.message}`;
+        chatroom.appendChild(messageElement);
+      });
+    }
+
+    // Open Popups for Hiring/Charity
+    function openPopup(type) {
+      const modalTitle = type === 'hiring' ? 'Hiring (Satire)' : 'Charity (aka My Pocket)';
+      const modalContent = type === 'hiring'
+        ? `<p><strong>ALL SATIRE — DO NOT ENTER REAL INFO.</strong></p>
+           <form><label>Name</label><input type="text" placeholder="Your name">
+           <label>Phone Number</label><input type="text" placeholder="Phone number">
+           <label>Email</label><input type="email" placeholder="email@example.com">
+           <label>SSN</label><input type="text" placeholder="000-00-0000">
+           <label>Credit Card</label><input type="text" placeholder="4111 1111 1111 1111">
+           <button type="submit">Submit</button></form>`
+        : `<p><strong>ALL SATIRE — DO NOT ENTER REAL INFO.</strong></p>
+           <form><label>Name</label><input type="text" placeholder="Your name">
+           <label>Message</label><input type="text" placeholder="Message for charity">
+           <label>Credit Card</label><input type="text" placeholder="4111 1111 1111 1111">
+           <button type="submit">Donate</button></form>`;
+      document.getElementById('modalTitle').textContent = modalTitle;
+      document.getElementById('modalContent').innerHTML = modalContent;
+      document.getElementById('modalBack').style.display = 'flex';
+    }
+
+    function showPopup(owner) {
+      const o = coOwnerDetails[owner];
+      document.getElementById('modalTitle').textContent = o.title;
+      document.getElementById('modalContent').innerHTML = `<p>${o.description}</p>`;
+      document.getElementById('modalBack').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modalBack').style.display = 'none';
+    }
+
+    // DVD bouncing logo background
+    const canvas = document.getElementById("dvdCanvas");
+    const ctx = canvas.getContext("2d");
+    let logo = { x: 100, y: 100, dx: 2.5, dy: 2, color: randomColor() };
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function randomColor() {
+      const colors = ["#c62828", "#ff9800", "#2196f3", "#4caf50", "#9c27b0", "#e91e63"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function drawLogo() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "bold 40px Arial";
+      ctx.fillStyle = logo.color;
+      ctx.fillText("anything.com", logo.x, logo.y);
+    }
+
+    function update() {
+      logo.x += logo.dx;
+      logo.y += logo.dy;
+      if (logo.x + 250 > canvas.width || logo.x < 0) {
+        logo.dx *= -1;
+        logo.color = randomColor();
+      }
+      if (logo.y > canvas.height - 20 || logo.y < 40) {
+        logo.dy *= -1;
+        logo.color = randomColor();
+      }
+      drawLogo();
+      requestAnimationFrame(update);
+    }
+
+    update();
+  </script>
+</body>
+</html>
